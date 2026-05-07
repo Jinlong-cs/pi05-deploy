@@ -11,7 +11,28 @@ This repository keeps the deployment path only:
 
 It intentionally leaves out reports, profiling summaries, temporary experiments, datasets, weights, and generated engines.
 
-## Layout
+## Scope
+
+`pi0.5-orin` is a small deployment repository for running `lerobot/pi05_base` on Orin-class devices. It is not a training repo and it is not a full copy of the original `tinyaction/pi0.5` workspace.
+
+Current runtime paths:
+
+- `pytorch`: eager baseline for bring-up and correctness checks
+- `trt_fp16`: staged TensorRT runtime
+- `trt_int8`: staged TensorRT runtime with PTQ/QDQ engines
+
+## Requirements
+
+- Python `>=3.10`
+- NVIDIA GPU for real deployment runs
+- Jetson Orin + JetPack 6 for the intended target path
+
+Recommended Jetson runtime mode:
+
+- `MAXN`
+- `jetson_clocks`
+
+## Repository Layout
 
 - `src/pi05_orin/`: runtime, presets, TensorRT runner, wrappers
 - `scripts/`: setup, download, eval, benchmark, export, TensorRT build
@@ -36,6 +57,15 @@ Validate the install:
 ```bash
 .venv/bin/python scripts/setup_pi05_stack.py --validate
 ```
+
+## Runtime Layout
+
+The optimized Orin path is split into three TensorRT stages plus a CUDA-graph suffix loop:
+
+1. `prefix_embed`
+2. `prefix_lm`
+3. `suffix_step`
+4. repeated suffix denoise steps via CUDA Graph replay
 
 ## Quick Start
 
@@ -72,4 +102,16 @@ See [`docs/deploy.md`](docs/deploy.md) for the staged runtime layout and Jetson-
 
 - dataset preset: `lerobot/aloha_sim_insertion_human_image`
 - model preset: `lerobot/pi05_base`
-- recommended Jetson mode: `MAXN + jetson_clocks`
+- batch size: `1`
+- tokenizer max length: `200`
+- inference steps: `10`
+
+## Non-Goals
+
+This repository does not include:
+
+- training code
+- experiment reports
+- profiling outputs
+- generated engines or ONNX exports
+- model weights or datasets
