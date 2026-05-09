@@ -1,7 +1,7 @@
 # Deploy Command Reference
 
 This page is the short command reference for the PI0.5 Orin deployment flow.
-The README contains the longer explanation, current AGX results, and caveats.
+The README contains the longer explanation and the public latency summary.
 
 ## Runtime Contract
 

@@ -11,7 +11,7 @@ with:
   and `suffix_step`.
 - Real TensorRT PTQ calibration utilities for the three exported stages.
 - QDQ helper utilities for suffix quantization experiments.
-- Open-loop evaluation, latency benchmark, and final AGX baseline JSON results.
+- Open-loop evaluation and latency benchmark scripts.
 
 Upstream model package: [huggingface.co/lerobot/pi05_base](https://huggingface.co/lerobot/pi05_base).
 
@@ -20,10 +20,7 @@ Upstream model package: [huggingface.co/lerobot/pi05_base](https://huggingface.c
 ```text
 pi0.5-orin/
 ├── docs/
-│   ├── deploy.md                         # Command reference for the deploy flow
-│   └── pi05_deployment_pipeline_agx_orin.png
-├── results/
-│   └── agx_int8_suffix_graph/            # Final AGX INT8 + suffix-graph JSON results
+│   └── deploy.md                         # Command reference for the deploy flow
 ├── scripts/
 │   ├── install_jetson_pi05_stack.sh
 │   ├── setup_pi05_stack.py
@@ -49,6 +46,7 @@ Large assets are intentionally not tracked:
 - Captured calibration tensors.
 - ONNX exports and TensorRT engines.
 - Intermediate profiling outputs.
+- Raw benchmark and evaluation result files.
 
 ## Runtime Layout
 
@@ -72,10 +70,6 @@ Default public preset:
 - action latent: `[1, 50, 32]`
 - final action chunk: `[1, 50, 14]`
 - inference steps: `10`
-
-Pipeline figure:
-
-- [`docs/pi05_deployment_pipeline_agx_orin.png`](docs/pi05_deployment_pipeline_agx_orin.png)
 
 ## Environment Setup
 
@@ -264,66 +258,30 @@ PYTHONPATH=src PI05_TRT_SUFFIX_GRAPH=0 .venv/bin/python scripts/benchmark_pi05.p
   --backend trt_int8
 ```
 
-## Current AGX Baseline
+## Published AGX Summary
 
-Final AGX JSON outputs are kept under
-[`results/agx_int8_suffix_graph/`](results/agx_int8_suffix_graph/).
+The repository does not include raw benchmark JSON, calibration captures, or
+internal profiling artifacts. The table below is a compact public summary for
+the default `trt_int8 + suffix CUDA Graph` deployment path, measured on Jetson
+AGX Orin with `MAXN + jetson_clocks`, batch size 1, `num_inference_steps=10`,
+`warmup=5`, and `measure=20`.
 
-Measured on Jetson AGX Orin with `MAXN + jetson_clocks`, batch size 1,
-`num_inference_steps=10`, `warmup=5`, `measure=20`.
-
-| Runtime | Mean policy | Mean E2E | P95 E2E | Notes |
-| --- | ---: | ---: | ---: | --- |
-| PyTorch eager baseline | 1744.72 ms | 1748.02 ms | n/a | Original full policy path |
-| TRT FP16 | 208.65 ms | 211.91 ms | n/a | 3 staged engines |
-| TRT real PTQ INT8 | 198.88 ms | 202.15 ms | 202.32 ms | 3 PTQ engines |
-| TRT real PTQ INT8 + suffix CUDA Graph | 185.92 ms | 189.56 ms | 189.67 ms | Default optimized path |
-| TRT real PTQ INT8 + prefix_lm+suffix CUDA Graph | 183.20 ms | 186.52 ms | 186.74 ms | Opt-in experiment, not default |
-
-Default optimized stage means:
-
-| Stage | Mean latency |
-| --- | ---: |
-| Host preprocess | 3.64 ms |
-| `prefix_embed.engine` | 15.70 ms |
-| `prefix_lm.engine` | 80.00 ms |
-| `suffix_step.engine` naive 10-step loop | 107.14 ms |
-| `suffix_step.engine` CUDA Graph 10-step replay | 88.81 ms |
-
-Open-loop full-eval metrics for the INT8 graph path:
-
-| Metric | Value |
-| --- | ---: |
-| normalized action MSE | 0.3166 |
-| normalized action L1 | 0.4768 |
-| normalized first-action MSE | 0.3102 |
-| normalized first-action L1 | 0.4722 |
+| Platform | Module / runtime stage | Mean latency |
+| --- | --- | ---: |
+| Jetson AGX Orin | Host preprocess | 3.64 ms |
+| Jetson AGX Orin | `prefix_embed.engine` | 15.70 ms |
+| Jetson AGX Orin | `prefix_lm.engine` | 80.00 ms |
+| Jetson AGX Orin | `suffix_step.engine` 10-step CUDA Graph replay | 88.81 ms |
+| Jetson AGX Orin | Full policy runtime | 185.92 ms |
+| Jetson AGX Orin | End-to-end runtime | 189.56 ms |
 
 Accuracy caveat:
 
-- These are open-loop action errors, not closed-loop robot success rates.
-- Current suffix INT8 still contains substantial FP16/FP32 fallback paths in
-  TensorRT inspector output, so the INT8 work should be read as a stable PTQ
-  baseline, not a pure INT8 implementation.
-
-## Optional QDQ Suffix Utilities
-
-The QDQ path is kept as an experimental suffix quantization helper:
-
-```bash
-PYTHONPATH=src .venv/bin/python scripts/rewrite_suffix_onnx_fp64_trig_to_fp32.py \
-  --source-onnx outputs/trt_onnx/pi05_aloha_public/suffix_step.onnx \
-  --output-onnx outputs/trt_onnx/pi05_aloha_public/suffix_step_fp32_trig.onnx
-
-PYTHONPATH=src .venv/bin/python scripts/quantize_suffix_onnx_qdq.py \
-  --source-onnx outputs/trt_onnx/pi05_aloha_public/suffix_step_fp32_trig.onnx \
-  --output-onnx outputs/trt_onnx/pi05_aloha_public/suffix_step_qdq.onnx \
-  --capture-root outputs/trt_captures/pi05_aloha_public \
-  --op-types MatMul
-```
-
-Do not treat QDQ suffix output as the default runtime until latency and
-open-loop drift are revalidated for the exact engine being used.
+- Public latency numbers are deployment summaries, not raw benchmark artifacts.
+- Open-loop action error and closed-loop robot success rate are not bundled in
+  this repository.
+- Current suffix INT8 still contains FP16/FP32 fallback paths, so this should be
+  read as a practical PTQ deployment baseline rather than a pure INT8 claim.
 
 ## License
 
