@@ -15,33 +15,6 @@ with:
 
 Upstream model package: [huggingface.co/lerobot/pi05_base](https://huggingface.co/lerobot/pi05_base).
 
-## File Structure
-
-```text
-pi05-deploy/
-├── docs/
-│   └── deploy.md                         # Command reference for the deploy flow
-├── fixtures/
-│   └── pi05_minimal_fixture.json          # Synthetic public fixture for CLI validation
-├── scripts/
-│   ├── install_jetson_pi05_stack.sh
-│   ├── setup_pi05_stack.py
-│   ├── check_minimal_fixture.py
-│   ├── download_dataset.py
-│   ├── make_fixed_eval_split.py
-│   ├── download_pi05_assets.py
-│   ├── eval_open_loop_pi05.py
-│   ├── benchmark_pi05.py
-│   ├── capture_pi05_trt_inputs.py
-│   ├── export_pi05_prefix_onnx.py
-│   ├── export_pi05_suffix_onnx.py
-│   ├── build_trt_engine.py
-│   ├── build_trt_ptq_engine.py
-│   ├── rewrite_suffix_onnx_fp64_trig_to_fp32.py
-│   └── quantize_suffix_onnx_qdq.py
-└── src/pi05_orin/                         # Runtime, paths, presets, wrappers
-```
-
 Large assets are intentionally not tracked:
 
 - LeRobot datasets and split cache.
