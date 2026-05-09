@@ -1,0 +1,18 @@
+{
+  "repo_id": "lerobot/aloha_sim_insertion_human_image",
+  "model_ref": "/root/wujinlong/pi0.5/artifacts/models/lerobot__pi05_base",
+  "device": "cuda",
+  "backend": "trt_int8",
+  "batch_size": 1,
+  "warmup_batches": 5,
+  "measure_batches": 20,
+  "num_inference_steps": 10,
+  "samples_measured": 20,
+  "mean_preprocess_ms": 3.31716004802729,
+  "mean_policy_ms": 183.1958945011138,
+  "mean_end_to_end_ms": 186.51998059940524,
+  "p50_end_to_end_ms": 186.52374600060284,
+  "p95_end_to_end_ms": 186.74472799466457,
+  "p50_policy_ms": 183.18879400612786,
+  "p95_policy_ms": 183.420590008609
+}

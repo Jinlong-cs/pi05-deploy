@@ -1,0 +1,16 @@
+{
+  "seed": 20260507,
+  "suffix_shape": [
+    1,
+    50,
+    14
+  ],
+  "full_shape": [
+    1,
+    50,
+    14
+  ],
+  "mean_abs_diff": 0.0,
+  "max_abs_diff": 0.0,
+  "rmse": 0.0
+}
