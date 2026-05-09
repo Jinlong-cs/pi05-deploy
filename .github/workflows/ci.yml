@@ -32,3 +32,6 @@ jobs:
 
       - name: Validate helper script entrypoint
         run: python scripts/setup_pi05_stack.py --validate >/dev/null
+
+      - name: Validate minimal public fixture
+        run: python scripts/check_minimal_fixture.py >/dev/null
