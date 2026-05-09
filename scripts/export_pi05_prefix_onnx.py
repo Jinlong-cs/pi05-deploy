@@ -53,35 +53,14 @@ def resolve_model_ref(preset_name: str, explicit_ref: str | None) -> str:
 
 
 def maybe_check_onnx(path: Path) -> None:
-    try:
-        import onnx
+    import onnx
 
-        model = onnx.load(str(path))
-        onnx.checker.check_model(model)
-    except Exception as exc:
-        print(f"warning: onnx validation skipped for {path}: {exc}")
+    model = onnx.load(str(path))
+    onnx.checker.check_model(model)
 
 
 def ensure_onnx_available() -> None:
-    try:
-        import onnx  # noqa: F401
-        return
-    except Exception:
-        pass
-
-    import sys
-
-    for candidate in ("/usr/lib/python3/dist-packages", "/usr/lib/python3.10/dist-packages"):
-        if candidate not in sys.path and Path(candidate).exists():
-            sys.path.append(candidate)
-            try:
-                import onnx  # noqa: F401
-
-                return
-            except Exception:
-                continue
-
-    raise RuntimeError("The active Python environment is missing the 'onnx' package required by torch.onnx.export.")
+    import onnx  # noqa: F401
 
 
 def main() -> None:

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import time
 from pathlib import Path
 
 from lerobot.datasets.dataset_metadata import LeRobotDatasetMetadata
@@ -28,16 +27,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def run_with_retries(fn, retries: int):
-    last_error = None
-    for attempt in range(1, retries + 1):
-        try:
-            return fn()
-        except Exception as exc:  # noqa: BLE001
-            last_error = exc
-            if attempt == retries:
-                break
-            time.sleep(min(attempt * 2, 8))
-    raise last_error
+    del retries
+    return fn()
 
 
 def summarize(meta: LeRobotDatasetMetadata, root: Path) -> dict:

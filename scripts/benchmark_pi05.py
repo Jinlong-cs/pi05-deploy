@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import statistics
 import time
@@ -107,11 +108,7 @@ def main() -> None:
     iterator = iter(loader)
 
     with torch.no_grad():
-        for _ in range(args.warmup_batches):
-            try:
-                raw_batch = next(iterator)
-            except StopIteration:
-                break
+        for raw_batch in itertools.islice(iterator, args.warmup_batches):
             batch = runtime.preprocessor(raw_batch)
             runtime.policy.predict_action_chunk(batch)
             maybe_sync(args.device)
@@ -121,12 +118,7 @@ def main() -> None:
         end_to_end_latencies_ms: list[float] = []
         samples_measured = 0
 
-        for _ in range(args.measure_batches):
-            try:
-                raw_batch = next(iterator)
-            except StopIteration:
-                break
-
+        for raw_batch in itertools.islice(iterator, args.measure_batches):
             maybe_sync(args.device)
             end_start = time.perf_counter()
 

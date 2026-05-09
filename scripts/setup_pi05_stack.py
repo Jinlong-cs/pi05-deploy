@@ -17,10 +17,12 @@ def parse_args() -> argparse.Namespace:
 
 
 def has_module(name: str) -> bool:
-    try:
-        return importlib.util.find_spec(name) is not None
-    except ModuleNotFoundError:
-        return False
+    checked = []
+    for part in name.split("."):
+        checked.append(part)
+        if importlib.util.find_spec(".".join(checked)) is None:
+            return False
+    return True
 
 
 def main() -> None:

@@ -123,18 +123,10 @@ class StableHashTokenizer:
 
 
 def load_tokenizer_fallback(tokenizer_name: str) -> Any:
-    try:
-        from transformers import AutoTokenizer
+    from transformers import AutoTokenizer
 
-        LOGGER.warning("Falling back to tokenizer '%s' for pi0.5 preprocessing.", tokenizer_name)
-        return AutoTokenizer.from_pretrained(tokenizer_name)
-    except Exception as exc:
-        LOGGER.warning(
-            "Failed to load tokenizer fallback '%s' (%s). Using StableHashTokenizer instead.",
-            tokenizer_name,
-            exc,
-        )
-        return StableHashTokenizer()
+    LOGGER.warning("Loading tokenizer '%s' for pi0.5 preprocessing.", tokenizer_name)
+    return AutoTokenizer.from_pretrained(tokenizer_name)
 
 
 def make_pi05_pre_post_processors_with_tokenizer(
@@ -206,24 +198,7 @@ def load_pi05_processors(
             tokenizer=tokenizer,
         )
 
-    try:
-        return make_pi05_pre_post_processors(config=config, dataset_stats=dataset_stats)
-    except Exception as exc:
-        error_text = str(exc)
-        if DEFAULT_PI05_TOKENIZER not in error_text and "gated repo" not in error_text.lower():
-            raise
-
-        LOGGER.warning(
-            "Falling back from gated tokenizer '%s' after preprocessing init failed: %s",
-            DEFAULT_PI05_TOKENIZER,
-            exc,
-        )
-        tokenizer = load_tokenizer_fallback(PUBLIC_TOKENIZER_FALLBACK)
-        return make_pi05_pre_post_processors_with_tokenizer(
-            config=config,
-            dataset_stats=dataset_stats,
-            tokenizer=tokenizer,
-        )
+    return make_pi05_pre_post_processors(config=config, dataset_stats=dataset_stats)
 
 
 def adapt_normalization_mapping(

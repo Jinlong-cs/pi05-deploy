@@ -25,10 +25,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _load_tensorrt() -> Any:
-    try:
-        import tensorrt as trt
-    except ImportError as exc:  # pragma: no cover - depends on AGX runtime
-        raise RuntimeError("TensorRT Python bindings are required for TRT runtime.") from exc
+    import tensorrt as trt
+
     return trt
 
 
@@ -43,10 +41,7 @@ def _trt_dtype_to_torch(dtype: Any) -> torch.dtype:
         trt.int8: torch.int8,
         trt.bool: torch.bool,
     }
-    try:
-        return mapping[dtype]
-    except KeyError as exc:  # pragma: no cover - depends on TRT engine details
-        raise ValueError(f"Unsupported TensorRT dtype: {dtype}") from exc
+    return mapping[dtype]
 
 
 def _env_flag(name: str, default: bool) -> bool:
@@ -261,18 +256,7 @@ class _SuffixCudaGraphLoop:
 
         signature = self._signature(prefix_pad_masks=prefix_pad_masks, cache_tensors=cache_tensors, x_t=x_t)
         if signature != self.capture_signature:
-            try:
-                self._capture(prefix_pad_masks=prefix_pad_masks, cache_tensors=cache_tensors, x_t=x_t)
-            except Exception as exc:  # pragma: no cover - depends on AGX runtime support
-                self.enabled = False
-                self.capture_error = repr(exc)
-                LOGGER.warning("Disabling suffix CUDA graph path after capture failure: %s", self.capture_error)
-                self.graph = None
-                self.static_x_t = None
-                self.static_dt = None
-                self.shared_outputs = None
-                self.static_timesteps = []
-                return None
+            self._capture(prefix_pad_masks=prefix_pad_masks, cache_tensors=cache_tensors, x_t=x_t)
             self.capture_signature = signature
 
         if self.graph is None or self.static_x_t is None:
