@@ -18,7 +18,7 @@ Upstream model package: [huggingface.co/lerobot/pi05_base](https://huggingface.c
 ## File Structure
 
 ```text
-pi0.5-orin/
+pi05-deploy/
 ├── docs/
 │   └── deploy.md                         # Command reference for the deploy flow
 ├── scripts/
