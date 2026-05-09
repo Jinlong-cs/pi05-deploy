@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Jinlong-cs/pi0.5-orin"
+Homepage = "https://github.com/Jinlong-cs/pi05-deploy"
 Upstream-LeRobot = "https://github.com/huggingface/lerobot"
 PI05-Model = "https://huggingface.co/lerobot/pi05_base"
 
