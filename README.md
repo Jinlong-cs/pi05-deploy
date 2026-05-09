@@ -21,9 +21,12 @@ Upstream model package: [huggingface.co/lerobot/pi05_base](https://huggingface.c
 pi05-deploy/
 ├── docs/
 │   └── deploy.md                         # Command reference for the deploy flow
+├── fixtures/
+│   └── pi05_minimal_fixture.json          # Synthetic public fixture for CLI validation
 ├── scripts/
 │   ├── install_jetson_pi05_stack.sh
 │   ├── setup_pi05_stack.py
+│   ├── check_minimal_fixture.py
 │   ├── download_dataset.py
 │   ├── make_fixed_eval_split.py
 │   ├── download_pi05_assets.py
@@ -94,6 +97,13 @@ Validate the local stack:
 
 ```bash
 PYTHONPATH=src .venv/bin/python scripts/setup_pi05_stack.py --validate
+```
+
+Validate the repository's synthetic public fixture without model weights or
+private data:
+
+```bash
+python3 scripts/check_minimal_fixture.py
 ```
 
 On AGX benchmark runs, use:
