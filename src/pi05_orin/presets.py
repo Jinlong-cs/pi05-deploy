@@ -47,8 +47,7 @@ DEFAULT_PRESET = "pi05_aloha_public"
 
 
 def get_preset(name: str) -> ExperimentPreset:
-    try:
-        return PRESETS[name]
-    except KeyError as exc:
+    if name not in PRESETS:
         available = ", ".join(sorted(PRESETS))
-        raise ValueError(f"Unknown preset '{name}'. Available presets: {available}") from exc
+        raise ValueError(f"Unknown preset '{name}'. Available presets: {available}")
+    return PRESETS[name]

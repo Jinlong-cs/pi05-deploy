@@ -107,16 +107,11 @@ def main() -> None:
 
     captured = 0
     captured_per_episode: dict[int, int] = {}
-    skipped_indices: list[dict[str, object]] = []
     for dataset_idx in range(args.sample_offset, len(runtime.dataset)):
         if captured >= args.num_samples:
             break
 
-        try:
-            raw_item = runtime.dataset[dataset_idx]
-        except Exception as exc:
-            skipped_indices.append({"dataset_idx": dataset_idx, "error": repr(exc)})
-            continue
+        raw_item = runtime.dataset[dataset_idx]
         episode_index = scalar_to_int(raw_item["episode_index"])
         if episode_index not in allowed_episodes:
             continue
@@ -162,7 +157,6 @@ def main() -> None:
                 "sample_index": dataset_idx,
                 "image_key": image_key,
                 "cache_tensors": cache_names,
-                "skipped_before_this_sample": len(skipped_indices),
                 "inputs": {name: list(tensor.shape) for name, tensor in inputs_payload.items()},
                 "prefix": {name: list(tensor.shape) for name, tensor in prefix_payload.items()},
             }
@@ -245,11 +239,6 @@ def main() -> None:
 
     if captured == 0:
         raise RuntimeError("No samples were captured.")
-
-    if skipped_indices:
-        (output_root / f"{args.split}_skipped_indices.json").write_text(
-            json.dumps(skipped_indices, indent=2, ensure_ascii=False)
-        )
 
 
 if __name__ == "__main__":

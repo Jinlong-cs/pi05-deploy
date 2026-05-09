@@ -44,12 +44,9 @@ def dynamic_cache_from_flat(
     config: object | None = None,
 ) -> object:
     legacy_cache = legacy_cache_from_flat(flat_cache, num_layers)
-    try:
-        from transformers.cache_utils import DynamicCache
+    from transformers.cache_utils import DynamicCache
 
-        return DynamicCache(legacy_cache, config=config)
-    except Exception:
-        return legacy_cache
+    return DynamicCache(legacy_cache, config=config)
 
 
 def save_io_summary(path: Path, *, inputs: dict[str, Tensor], outputs: dict[str, Tensor]) -> None:

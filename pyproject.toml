@@ -8,6 +8,10 @@ version = "0.1.0"
 description = "Deploy-oriented PI0.5 runtime and TensorRT tooling for Jetson Orin"
 readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Jinlong Wu"}
+]
 dependencies = [
   "torch>=2.4",
   "torchvision>=0.19",
@@ -20,6 +24,18 @@ dependencies = [
   "safetensors>=0.4.3",
   "sentencepiece>=0.2",
 ]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.urls]
+Homepage = "https://github.com/Jinlong-cs/pi0.5-orin"
+Upstream-LeRobot = "https://github.com/huggingface/lerobot"
+PI05-Model = "https://huggingface.co/lerobot/pi05_base"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

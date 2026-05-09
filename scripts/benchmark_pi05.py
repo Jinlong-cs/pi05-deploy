@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import statistics
 import time
@@ -41,6 +42,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-inference-steps", type=int)
     parser.add_argument("--compile-model", action="store_true")
     parser.add_argument("--backend", choices=["pytorch", "trt_fp16", "trt_int8"], default="pytorch")
+    parser.add_argument("--engine-root", type=Path, help="Override TensorRT engine root for TRT backends.")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--revision", default="main")
     return parser.parse_args()
@@ -93,6 +95,7 @@ def main() -> None:
             revision=args.revision,
             preset_name=args.preset,
             precision="fp16" if args.backend == "trt_fp16" else "int8",
+            engine_root=args.engine_root,
             num_inference_steps=args.num_inference_steps,
         )
 
@@ -105,11 +108,7 @@ def main() -> None:
     iterator = iter(loader)
 
     with torch.no_grad():
-        for _ in range(args.warmup_batches):
-            try:
-                raw_batch = next(iterator)
-            except StopIteration:
-                break
+        for raw_batch in itertools.islice(iterator, args.warmup_batches):
             batch = runtime.preprocessor(raw_batch)
             runtime.policy.predict_action_chunk(batch)
             maybe_sync(args.device)
@@ -119,12 +118,7 @@ def main() -> None:
         end_to_end_latencies_ms: list[float] = []
         samples_measured = 0
 
-        for _ in range(args.measure_batches):
-            try:
-                raw_batch = next(iterator)
-            except StopIteration:
-                break
-
+        for raw_batch in itertools.islice(iterator, args.measure_batches):
             maybe_sync(args.device)
             end_start = time.perf_counter()
 
